@@ -29,12 +29,21 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-		super.configure(security);
+		security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
 	}
 
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		super.configure(clients);
+		// Configuración de un único cliente: onlinestoreapp, 
+		// Si queremos agregar más clientes, después del refreshTokenValiditySeconds(3600), concatenar
+		// un .and() y agregar nuevamente un .withClient()... y establecerle nuevas configuraciones
+		clients.inMemory()
+			.withClient("onlinestoreapp")
+			.secret(this.passwordEncoder.encode("12345"))
+			.scopes("read", "write")
+			.authorizedGrantTypes("password", "refresh_token")
+			.accessTokenValiditySeconds(3600)
+			.refreshTokenValiditySeconds(3600);
 	}
 
 	@Override
