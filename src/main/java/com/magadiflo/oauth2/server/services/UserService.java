@@ -16,7 +16,7 @@ import com.magadiflo.commons.users.models.entity.User;
 import com.magadiflo.oauth2.server.clients.IUserFeignClient;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService implements IUserService, UserDetailsService {
 
 	private final IUserFeignClient client;
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
@@ -27,7 +27,7 @@ public class UserService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = this.client.findByUsername(username);
+		User user = this.findByUsername(username);
 
 		if (user == null) {
 			LOGGER.error("Login error, username [{}] not found!", username);
@@ -43,6 +43,11 @@ public class UserService implements UserDetailsService {
 
 		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
 				user.getEnabled(), true, true, true, authorities);
+	}
+
+	@Override
+	public User findByUsername(String username) {
+		return this.client.findByUsername(username);
 	}
 
 }
