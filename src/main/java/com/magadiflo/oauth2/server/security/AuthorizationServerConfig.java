@@ -2,8 +2,10 @@ package com.magadiflo.oauth2.server.security;
 
 import java.util.Arrays;
 
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -15,6 +17,7 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
+@RefreshScope
 @Configuration
 @EnableAuthorizationServer // Lo habilitamos como un servidor de autorización
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
@@ -28,11 +31,14 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	// Viene de la clase InfoAdicionalToken
 	private final InfoAdicionalToken infoAdicionalToken;
 	
+	private final Environment env;
+	
 	public AuthorizationServerConfig(PasswordEncoder passwordEncoder, 
-			AuthenticationManager authenticationManager, InfoAdicionalToken infoAdicionalToken) {
+			AuthenticationManager authenticationManager, InfoAdicionalToken infoAdicionalToken, Environment env) {
 		this.passwordEncoder = passwordEncoder;
 		this.authenticationManager = authenticationManager;
 		this.infoAdicionalToken = infoAdicionalToken;
+		this.env = env;
 	}
 
 	@Override
@@ -46,8 +52,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		// Si queremos agregar más clientes, después del refreshTokenValiditySeconds(3600), concatenar
 		// un .and() y agregar nuevamente un .withClient()... y establecerle nuevas configuraciones
 		clients.inMemory()
-			.withClient("onlinestoreapp")
-			.secret(this.passwordEncoder.encode("12345"))
+			.withClient(this.env.getProperty("config.security.oauth.client.id"))
+			.secret(this.passwordEncoder.encode(this.env.getProperty("config.security.oauth.client.secret")))
 			.scopes("read", "write")
 			.authorizedGrantTypes("password", "refresh_token")
 			.accessTokenValiditySeconds(3600)
@@ -75,7 +81,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Bean
 	public JwtAccessTokenConverter accessTokenConverter() { // Información, datos por defecto del JWT
 		JwtAccessTokenConverter tokenConverter = new JwtAccessTokenConverter();
-		tokenConverter.setSigningKey("clave12345");				
+		tokenConverter.setSigningKey(this.env.getProperty("config.security.oauth.jwt.key"));				
 		return tokenConverter;
 	}
 
