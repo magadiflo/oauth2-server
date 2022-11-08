@@ -72,6 +72,13 @@
 			<groupId>org.glassfish.jaxb</groupId>
 			<artifactId>jaxb-runtime</artifactId>
 		</dependency>
+		<!-- La dependencia de abajo permite que funcione correctamente esta aplicación (microservice-cart)
+		como cliente del servidor de configuraciones. Esto en caso de que estemos usando
+		una versión de SpringBoot igual o superior a la 2.4.0 -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bootstrap</artifactId>
+		</dependency>
 		
 	</dependencies>
 	<dependencyManagement>
