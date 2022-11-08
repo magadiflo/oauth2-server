@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,6 +16,20 @@ public class AuthenticationSuccessErrorHandler implements AuthenticationEventPub
 
 	@Override
 	public void publishAuthenticationSuccess(Authentication authentication) {
+		// Tenemos dos alternativas para que no tome el username del cliente app ya que solamete nos interesa 
+		// cuando el usuario registrado en la BD se ha autenticado exitosamente.
+		// Para el ejemplo, se dejaron las dos formas, se puede optar solo por una.
+		
+		// 1° alternativa: verifica que es el cliente de la aplicación: onlinestoreapp
+		if (authentication.getDetails() instanceof WebAuthenticationDetails) {
+			return;
+		}
+
+		// 2° alternativa, esta forma queda muy acoplado. Por que que pasa si se cambia el cliente: onlinestoreapp, se tendría que venir aquí y actualizar
+		if (authentication.getName().equalsIgnoreCase("onlinestoreapp")) {
+			return;
+		}
+
 		UserDetails user = (UserDetails) authentication.getPrincipal();
 
 		LOGGER.info("Success login: {}", user.getUsername());
