@@ -56,6 +56,7 @@ public class AuthenticationSuccessErrorHandler implements AuthenticationEventPub
 
 	// Este método saltará cuando la contraseña sea ingresada de manera incorrecta, es decir, la persona ingresa
 	// el username correctamente, pero la contraseña no.
+	// El trycatch se activará cuando el username no exista en la BD
 	@Override
 	public void publishAuthenticationFailure(AuthenticationException exception, Authentication authentication) {
 		LOGGER.error("Error en el login: {}", exception.getMessage());
