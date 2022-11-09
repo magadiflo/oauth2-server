@@ -50,4 +50,9 @@ public class UserService implements IUserService, UserDetailsService {
 		return this.client.findByUsername(username);
 	}
 
+	@Override
+	public User update(User user, Long id) {
+		return this.client.update(user, id);
+	}
+
 }

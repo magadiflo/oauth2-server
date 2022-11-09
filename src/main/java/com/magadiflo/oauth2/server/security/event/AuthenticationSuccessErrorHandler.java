@@ -2,6 +2,7 @@ package com.magadiflo.oauth2.server.security.event;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -9,10 +10,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 
+import com.magadiflo.oauth2.server.services.IUserService;
+
 @Component
 public class AuthenticationSuccessErrorHandler implements AuthenticationEventPublisher {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(AuthenticationSuccessErrorHandler.class);
+	
+	private final IUserService userService; // Se obtendrá de la clase service UserService
+	
+	public AuthenticationSuccessErrorHandler(IUserService userService) {
+		this.userService = userService;
+	}
 
 	@Override
 	public void publishAuthenticationSuccess(Authentication authentication) {
